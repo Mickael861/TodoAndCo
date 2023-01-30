@@ -2,12 +2,10 @@
 
 {% block body %}
     <div class="row">
+        <a href="{{ path('task_list') }}" class="btn btn-primary mb-4 btn-home-page m-auto">Retour à la liste des tâches</a>
         {{ form_start(form, {'action' : path('task_create')}) }}
             {{ form_widget(form) }}
-
-            <button type="submit" class="btn btn-success pull-right">Ajouter</button>
+            <button type="submit" class="btn btn-success">Ajouter</button>
         {{ form_end(form) }}
-
-        <a href="{{ path('task_list') }}" class="btn btn-primary">Retour à la liste des tâches</a>
     </div>
 {% endblock %}
