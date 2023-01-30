@@ -10,8 +10,11 @@
 
         <title>To Do List app</title>
 
-        <!-- Bootstrap Core CSS -->
-        <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
+        <!-- bootstrap css -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+        <!-- bootstrap js -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 
         <!-- Custom CSS -->
         <link href="{{ asset('css/shop-homepage.css') }}" rel="stylesheet">
@@ -28,7 +31,7 @@
         <nav class="navbar navbar-light navbar-fixed-top" style="background-color: #e3f2fd;" role="navigation">
             <div class="container">
                 <div class="navbar-header">
-                    <a class="navbar-brand" href="#">To Do List app</a>
+                    <a class="navbar-brand" href="{{ path('homepage') }}">To Do List app</a>
 
                     <img src="{{ asset('img/Logo_OpenClassrooms.png') }}" alt="OpenClassrooms" />
                 </div>
@@ -37,13 +40,13 @@
 
         <!-- Page Content -->
         <div class="container">
-            <div class="row">
+            <div class="row d-flex justify-content-evenly m-2">
                 {% if app.user and app.user.roles.ROLE == 'ROLE_ADMIN' %}
-                <a href="{{ path('user_create') }}" class="btn btn-primary">Créer un utilisateur</a>
+                <a href="{{ path('user_list') }}" class="btn btn-primary btn-home-page">Gestion des utilisateurs</a>
                 {% endif %}
 
                 {% if app.user %}
-                <a href="{{ path('logout') }}" class="pull-right btn btn-danger">Se déconnecter</a>
+                <a href="{{ path('logout') }}" class="btn btn-danger btn-home-page">Se déconnecter</a>
                 {% endif %}
 
                 {% if not app.user and 'login' != app.request.attributes.get('_route') %}
@@ -54,19 +57,19 @@
             <div class="row">
                 <div class="col-md-12">
                     {% for flash_message in app.session.flashBag.get('success') %}
-                        <div class="alert alert-success" role="alert">
+                        <div class="alert alert-success text-center" role="alert">
                             <strong>Superbe !</strong> {{ flash_message }}
                         </div>
                     {% endfor %}
 
                     {% for flash_message in app.session.flashBag.get('error') %}
-                        <div class="alert alert-danger" role="alert">
+                        <div class="alert alert-danger text-center" role="alert">
                             <strong>Oops !</strong> {{ flash_message }}
                         </div>
                     {% endfor %}
 
                     {% block header_title %}{% endblock %}
-                    {% block header_img %}<img class="slide-image" src="{{ asset('img/todolist_homepage.jpg') }}" alt="todo list">{% endblock %}
+                    {% block header_img %}<img class="slide-image rounded" src="{{ asset('img/todolist_homepage.jpg') }}" alt="todo list">{% endblock %}
                 </div>
             </div>
 
@@ -86,14 +89,11 @@
             <footer>
                 <div class="row">
                     <div class="col-lg-12">
-                        <p class="pull-right">Copyright &copy; OpenClassrooms</p>
+                        <p>Copyright &copy; OpenClassrooms</p>
                     </div>
                 </div>
             </footer>
 
         </div>
-
-        <script src="{{ asset('js/jquery.js') }}"></script>
-        <script src="{{ asset('js/bootstrap.min.js') }}"></script>
     </body>
 </html>
