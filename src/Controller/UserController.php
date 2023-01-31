@@ -51,7 +51,13 @@ class UserController extends AbstractController
      */
     public function listAction(): Response
     {
-        if ($this->securityService->verifyAccess()) {
+        if (
+            $this->securityService->isVerifyAccess(
+                'error',
+                "Vous n'avez pas le rôle néccessaire pour accéder à cette page",
+                'ROLE_USER'
+            )
+        ) {
             return $this->redirectToRoute('task_list');
         }
 
@@ -65,7 +71,13 @@ class UserController extends AbstractController
      */
     public function createAction(Request $request)
     {
-        if ($this->securityService->verifyAccess()) {
+        if (
+            $this->securityService->isVerifyAccess(
+                'error',
+                "Vous n'avez pas le rôle néccessaire pour accéder à cette page",
+                'ROLE_USER'
+            )
+        ) {
             return $this->redirectToRoute('task_list');
         }
 
@@ -86,11 +98,18 @@ class UserController extends AbstractController
      */
     public function editAction(User $user, Request $request)
     {
-        if ($this->securityService->verifyAccess()) {
+        if (
+            $this->securityService->isVerifyAccess(
+                'error',
+                "Vous n'avez pas le rôle néccessaire pour accéder à cette page",
+                'ROLE_USER'
+            )
+        ) {
             return $this->redirectToRoute('task_list');
         }
+
         $route_name = $request->get('_route');
-        
+
         $formUser = $this->formService->getUserForm($request, $user);
         if ($this->userService->crudUserManagement($formUser, $user, $route_name)) {
             $this->addFlash('success', "L'utilisateur a bien été modifié");

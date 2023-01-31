@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Task;
 use App\Service\FormService;
 use App\Service\TaskService;
+use App\Service\SecurityService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,11 +29,21 @@ class TaskController extends AbstractController
      */
     private $formService;
 
-    public function __construct(ManagerRegistry $manager, TaskService $taskService, FormService $formService)
-    {
+    /**
+     * @var SecurityService
+     */
+    private $securityService;
+
+    public function __construct(
+        ManagerRegistry $manager,
+        TaskService $taskService,
+        FormService $formService,
+        SecurityService $securityService
+    ) {
         $this->manager = $manager;
         $this->taskService = $taskService;
         $this->formService = $formService;
+        $this->securityService = $securityService;
     }
 
     /**
@@ -70,22 +81,17 @@ class TaskController extends AbstractController
      */
     public function editAction(Task $task, Request $request): Response
     {
-        /**
-         * @var User
-         */
-        $user = $this->getUser();
-
-        if ($user->getId() === $task->getUser()->getId()) {
+        if ($this->securityService->isIdIdentifier($task->getUser()->getId())) {
             $route_name = $request->get('_route');
 
             $taskForm = $this->formService->getTaskForm($request, $task);
-    
+
             if ($this->taskService->crudTaskManagement($taskForm, $task, $route_name)) {
                 $this->addFlash('success', 'La tâche a bien été modifiée.');
-    
+
                 return $this->redirectToRoute('task_list');
             }
-    
+
             return $this->render('task/edit.html.twig', [
                 'form' => $taskForm->createView(),
                 'task' => $task,
@@ -102,12 +108,7 @@ class TaskController extends AbstractController
      */
     public function toggleTaskAction(Task $task): Response
     {
-        /**
-         * @var User
-         */
-        $user = $this->getUser();
-
-        if ($user->getId() === $task->getUser()->getId()) {
+        if ($this->securityService->isIdIdentifier($task->getUser()->getId())) {
             $this->taskService->toggleTask($task);
 
             $is_done = $task->isDone() ? 'faite' : 'non terminée';
@@ -127,12 +128,10 @@ class TaskController extends AbstractController
      */
     public function deleteTaskAction(Task $task): Response
     {
-        /**
-         * @var User
-         */
-        $user = $this->getUser();
-
-        if ($user->getRoles()['ROLE'] === 'ROLE_ADMIN' && $task->getUser()->getId() === 0 || $user->getId() === $task->getUser()->getId()) {
+        if (
+            $this->securityService->isVerifyAccess(null, null, 'ROLE_ADMIN') && $task->getUser()->getId() === 0 ||
+            $this->securityService->isIdIdentifier($task->getUser()->getId())
+        ) {
             $this->taskService->deleteTask($task);
 
             $this->addFlash('success', 'La tâche a bien été supprimée.');
