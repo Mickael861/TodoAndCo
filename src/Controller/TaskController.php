@@ -70,20 +70,31 @@ class TaskController extends AbstractController
      */
     public function editAction(Task $task, Request $request): Response
     {
-        $route_name = $request->get('_route');
+        /**
+         * @var User
+         */
+        $user = $this->getUser();
 
-        $taskForm = $this->formService->getTaskForm($request, $task);
+        if ($user->getId() === $task->getUser()->getId()) {
+            $route_name = $request->get('_route');
 
-        if ($this->taskService->crudTaskManagement($taskForm, $task, $route_name)) {
-            $this->addFlash('success', 'La tâche a bien été modifiée.');
-
-            return $this->redirectToRoute('task_list');
+            $taskForm = $this->formService->getTaskForm($request, $task);
+    
+            if ($this->taskService->crudTaskManagement($taskForm, $task, $route_name)) {
+                $this->addFlash('success', 'La tâche a bien été modifiée.');
+    
+                return $this->redirectToRoute('task_list');
+            }
+    
+            return $this->render('task/edit.html.twig', [
+                'form' => $taskForm->createView(),
+                'task' => $task,
+            ]);
         }
 
-        return $this->render('task/edit.html.twig', [
-            'form' => $taskForm->createView(),
-            'task' => $task,
-        ]);
+        $this->addFlash('error', sprintf('Vous ne pouvez pas modifier cette tâche, elle ne vous appartient pas'));
+
+        return $this->redirectToRoute('task_list');
     }
 
     /**
@@ -91,11 +102,22 @@ class TaskController extends AbstractController
      */
     public function toggleTaskAction(Task $task): Response
     {
-        $this->taskService->toggleTask($task);
+        /**
+         * @var User
+         */
+        $user = $this->getUser();
 
-        $is_done = $task->isDone() ? 'faite' : 'non terminée';
+        if ($user->getId() === $task->getUser()->getId()) {
+            $this->taskService->toggleTask($task);
 
-        $this->addFlash('success', sprintf('La tâche %s a bien été marquée comme %s.', $task->getTitle(), $is_done));
+            $is_done = $task->isDone() ? 'faite' : 'non terminée';
+
+            $this->addFlash('success', sprintf('La tâche %s a bien été marquée comme %s.', $task->getTitle(), $is_done));
+
+            return $this->redirectToRoute('task_list');
+        }
+
+        $this->addFlash('error', sprintf('Vous ne pouvez pas modifier cette tâche, elle ne vous appartient pas'));
 
         return $this->redirectToRoute('task_list');
     }
@@ -105,9 +127,20 @@ class TaskController extends AbstractController
      */
     public function deleteTaskAction(Task $task): Response
     {
-        $this->taskService->deleteTask($task);
+        /**
+         * @var User
+         */
+        $user = $this->getUser();
 
-        $this->addFlash('success', 'La tâche a bien été supprimée.');
+        if ($user->getRoles()['ROLE'] === 'ROLE_ADMIN' && $task->getUser()->getId() === 0 || $user->getId() === $task->getUser()->getId()) {
+            $this->taskService->deleteTask($task);
+
+            $this->addFlash('success', 'La tâche a bien été supprimée.');
+
+            return $this->redirectToRoute('task_list');
+        }
+
+        $this->addFlash('error', sprintf('Vous ne pouvez pas supprimer cette tâche, elle ne vous appartient pas'));
 
         return $this->redirectToRoute('task_list');
     }

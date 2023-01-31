@@ -97,6 +97,8 @@ class TaskService extends AbstractController
     {
         $entityManager = $this->managerRegistry->getManager();
 
+        $task->setUser($this->getUser());
+
         $entityManager->persist($task);
         $entityManager->flush();
     }

@@ -72,8 +72,7 @@ class UserController extends AbstractController
         $user = new User();
 
         $formUser = $this->formService->getUserForm($request, $user);
-
-        if ($this->userService->crudTaskManagement($formUser, $user)) {
+        if ($this->userService->crudUserManagement($formUser, $user)) {
             $this->addFlash('success', "L'utilisateur a bien été ajouté.");
 
             return $this->redirectToRoute('user_list');
@@ -91,10 +90,9 @@ class UserController extends AbstractController
             return $this->redirectToRoute('task_list');
         }
         $route_name = $request->get('_route');
-
+        
         $formUser = $this->formService->getUserForm($request, $user);
-
-        if ($this->userService->crudTaskManagement($formUser, $user, $route_name)) {
+        if ($this->userService->crudUserManagement($formUser, $user, $route_name)) {
             $this->addFlash('success', "L'utilisateur a bien été modifié");
 
             return $this->redirectToRoute('user_list');

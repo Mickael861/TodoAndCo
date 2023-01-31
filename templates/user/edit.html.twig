@@ -5,9 +5,11 @@
 
 {% block body %}
     <div class="row">
-        {{ form_start(form, {'action' : path('user_edit', {'id' : user.id})}) }}
-        {{ form_widget(form) }}
-
+        {{ form_start(form, {'attr': {'novalidate': 'novalidate' , 'action' : path('user_edit', { 'id' : user.id })}}) }}
+            {{ form_row(form.username) }}
+            {{ form_row(form.password.first) }}
+            {{ form_row(form.password.second) }}
+            {{ form_row(form.email) }}
         <button type="submit" class="btn btn-success">Modifier</button>
         {{ form_end(form) }}
     </div>
