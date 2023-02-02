@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Service\SecurityService;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -14,7 +13,7 @@ class SecurityController extends AbstractController
     /**
      * @Route("/login", name="login")
      */
-    public function loginAction(AuthenticationUtils $authenticationUtils, SecurityService $securityService): Response
+    public function loginAction(AuthenticationUtils $authenticationUtils): Response
     {
         if (!empty($this->getUser())) {
             $this->addFlash('error', "Vous êtes déjà connecté");
