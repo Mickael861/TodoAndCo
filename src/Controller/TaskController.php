@@ -128,7 +128,7 @@ class TaskController extends AbstractController
     public function deleteTaskAction(Task $task): Response
     {
         if (
-            $this->securityService->isVerifyAccess(null, null, 'ROLE_ADMIN') && $task->isTaskUserAnonymous() ||
+            $this->securityService->isAccessVerificationRole(null, null, 'ROLE_ADMIN') && $task->isTaskUserAnonymous() ||
             $this->taskService->isBelongsUser($task)
         ) {
             dd('test');
