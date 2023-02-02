@@ -114,7 +114,10 @@ class TaskController extends AbstractController
 
             $is_done = $task->isDone() ? 'faite' : 'non terminée';
 
-            $this->addFlash('success', sprintf('La tâche %s a bien été marquée comme %s.', $task->getTitle(), $is_done));
+            $this->addFlash(
+                'success',
+                sprintf('La tâche %s a bien été marquée comme %s.', $task->getTitle(), $is_done)
+            );
 
             return $this->redirectToRoute('task_list');
         }
@@ -129,8 +132,14 @@ class TaskController extends AbstractController
      */
     public function deleteTaskAction(Task $task): Response
     {
+        $is_access_admin = $this->securityService->isAccessVerificationRole(
+            null,
+            null,
+            'ROLE_ADMIN'
+        );
+        
         if (
-            $this->securityService->isAccessVerificationRole(null, null, 'ROLE_ADMIN') && $task->isTaskUserAnonymous() ||
+            $is_access_admin && $task->isTaskUserAnonymous() ||
             $this->taskService->isBelongsUser($task)
         ) {
             $this->taskService->deleteTask($task);
