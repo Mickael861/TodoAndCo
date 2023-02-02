@@ -64,7 +64,6 @@ class TaskController extends AbstractController
         $task = new Task();
 
         $taskForm = $this->formService->getTaskForm($request, $task);
-
         if ($this->taskService->crudTaskManagement($taskForm, $task)) {
             $this->addFlash('success', 'La tâche a été bien été ajoutée.');
 
@@ -81,7 +80,7 @@ class TaskController extends AbstractController
      */
     public function editAction(Task $task, Request $request): Response
     {
-        if ($this->securityService->isIdIdentifier($task->getUser()->getId())) {
+        if ($this->taskService->isBelongsUser($task)) {
             $route_name = $request->get('_route');
 
             $taskForm = $this->formService->getTaskForm($request, $task);
@@ -108,7 +107,7 @@ class TaskController extends AbstractController
      */
     public function toggleTaskAction(Task $task): Response
     {
-        if ($this->securityService->isIdIdentifier($task->getUser()->getId())) {
+        if ($this->taskService->isBelongsUser($task)) {
             $this->taskService->toggleTask($task);
 
             $is_done = $task->isDone() ? 'faite' : 'non terminée';
@@ -129,9 +128,10 @@ class TaskController extends AbstractController
     public function deleteTaskAction(Task $task): Response
     {
         if (
-            $this->securityService->isVerifyAccess(null, null, 'ROLE_ADMIN') && $task->getUser()->getId() === 0 ||
-            $this->securityService->isIdIdentifier($task->getUser()->getId())
+            $this->securityService->isVerifyAccess(null, null, 'ROLE_ADMIN') && $task->isTaskUserAnonymous() ||
+            $this->taskService->isBelongsUser($task)
         ) {
+            dd('test');
             $this->taskService->deleteTask($task);
 
             $this->addFlash('success', 'La tâche a bien été supprimée.');

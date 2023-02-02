@@ -52,7 +52,7 @@ class UserController extends AbstractController
     public function listAction(): Response
     {
         if (
-            $this->securityService->isVerifyAccess(
+            $this->securityService->isAccessVerificationRole(
                 'error',
                 "Vous n'avez pas le rôle néccessaire pour accéder à cette page",
                 'ROLE_USER'
@@ -72,7 +72,7 @@ class UserController extends AbstractController
     public function createAction(Request $request)
     {
         if (
-            $this->securityService->isVerifyAccess(
+            $this->securityService->isAccessVerificationRole(
                 'error',
                 "Vous n'avez pas le rôle néccessaire pour accéder à cette page",
                 'ROLE_USER'
@@ -99,7 +99,7 @@ class UserController extends AbstractController
     public function editAction(User $user, Request $request)
     {
         if (
-            $this->securityService->isVerifyAccess(
+            $this->securityService->isAccessVerificationRole(
                 'error',
                 "Vous n'avez pas le rôle néccessaire pour accéder à cette page",
                 'ROLE_USER'

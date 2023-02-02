@@ -107,4 +107,20 @@ class Task
 
         return $this;
     }
+
+    /**
+     * Know if the user attached to the task is anonymous
+     *
+     * @return bool True if an anonymous user, false otherwise
+     */
+    public function isTaskUserAnonymous(): bool
+    {
+        if (empty($this->getUser()->getId())) {
+            return true;
+        }
+
+        return false;
+    }
+
+    
 }

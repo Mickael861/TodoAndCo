@@ -102,4 +102,18 @@ class TaskService extends AbstractController
         $entityManager->persist($task);
         $entityManager->flush();
     }
+
+    public function isBelongsUser(Task $task): bool
+    {
+        /**
+         * @var User
+         */
+        $user = $this->getUser();
+
+        if ($user->getId() === $task->getUser()->getId()) {
+            return true;
+        }
+
+        return false;
+    }
 }
