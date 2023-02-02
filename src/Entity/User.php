@@ -13,7 +13,14 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 /**
  * @ORM\Table("user")
  * @ORM\Entity
- * @UniqueEntity("email")
+ * @UniqueEntity(
+ *     fields={"username"},
+ *     message="Ce nom d'utilisateur existe déjà"
+ * )
+ * @UniqueEntity(
+ *     fields={"email"},
+ *     message="Cette adresse email existe déjà"
+ * )
  */
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -71,9 +78,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->username;
     }
 
-    public function setUsername($username)
+    public function setUsername($username): self
     {
         $this->username = $username;
+
+        return $this;
     }
 
     public function getSalt()
@@ -101,9 +110,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->email;
     }
 
-    public function setEmail($email)
+    public function setEmail($email): self
     {
         $this->email = $email;
+
+        return $this;
     }
 
     /**

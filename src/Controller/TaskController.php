@@ -49,10 +49,12 @@ class TaskController extends AbstractController
     /**
      * @Route("/tasks", name="task_list")
      */
-    public function listAction(): Response
+    public function listAction(Request $request): Response
     {
+        $task = $this->taskService->getTaskToggle($request);
+
         return $this->render('task/list.html.twig', [
-            'tasks' => $this->manager->getRepository(Task::class)->findAll()
+            'tasks' => $task
         ]);
     }
 
@@ -131,7 +133,6 @@ class TaskController extends AbstractController
             $this->securityService->isAccessVerificationRole(null, null, 'ROLE_ADMIN') && $task->isTaskUserAnonymous() ||
             $this->taskService->isBelongsUser($task)
         ) {
-            dd('test');
             $this->taskService->deleteTask($task);
 
             $this->addFlash('success', 'La tâche a bien été supprimée.');

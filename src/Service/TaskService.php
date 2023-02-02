@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Entity\Task;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class TaskService extends AbstractController
@@ -103,6 +104,12 @@ class TaskService extends AbstractController
         $entityManager->flush();
     }
 
+    /**
+     * Checks whether or not the task belongs to a connected user
+     *
+     * @param  Taksk $task Entity Task
+     * @return bool true if the task belongs to the connected user, false otherwise
+     */
     public function isBelongsUser(Task $task): bool
     {
         /**
@@ -115,5 +122,31 @@ class TaskService extends AbstractController
         }
 
         return false;
+    }
+
+    /**
+     * Retrieve completed or in-progress tasks
+     *
+     * @param  Request $request The request
+     * @return array Tasks
+     */
+    public function getTaskToggle(Request $request): array
+    {
+        $task = new \stdClass();
+        $task_completed = true;
+
+        if ($request->get('completed') === null || $request->get('completed') > 1) {
+            $task = $this->managerRegistry->getRepository(Task::class)->findAll();
+        } else {
+            if ((int) $request->get('completed') === 0) {
+                $task_completed = false;
+            }
+
+            $task = $this->managerRegistry->getRepository(Task::class)->findBy([
+                'isDone' => $task_completed
+            ]);
+        }
+
+        return $task;
     }
 }
