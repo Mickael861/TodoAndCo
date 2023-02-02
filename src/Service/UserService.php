@@ -33,7 +33,7 @@ class UserService
      * @param  string $route_name Name of the route
      * @return bool True if the backup is successful, false otherwise
      */
-    public function crudTaskManagement(FormInterface $form, User $user, string $route_name = 'user_create'): bool
+    public function crudUserManagement(FormInterface $form, User $user, string $route_name = 'user_create'): bool
     {
         $success = false;
 

@@ -51,7 +51,13 @@ class UserController extends AbstractController
      */
     public function listAction(): Response
     {
-        if ($this->securityService->verifyAccess()) {
+        if (
+            $this->securityService->isAccessVerificationRole(
+                'error',
+                "Vous n'avez pas le rôle néccessaire pour accéder à cette page",
+                'ROLE_USER'
+            )
+        ) {
             return $this->redirectToRoute('task_list');
         }
 
@@ -65,15 +71,20 @@ class UserController extends AbstractController
      */
     public function createAction(Request $request)
     {
-        if ($this->securityService->verifyAccess()) {
+        if (
+            $this->securityService->isAccessVerificationRole(
+                'error',
+                "Vous n'avez pas le rôle néccessaire pour accéder à cette page",
+                'ROLE_USER'
+            )
+        ) {
             return $this->redirectToRoute('task_list');
         }
 
         $user = new User();
 
         $formUser = $this->formService->getUserForm($request, $user);
-
-        if ($this->userService->crudTaskManagement($formUser, $user)) {
+        if ($this->userService->crudUserManagement($formUser, $user)) {
             $this->addFlash('success', "L'utilisateur a bien été ajouté.");
 
             return $this->redirectToRoute('user_list');
@@ -87,14 +98,20 @@ class UserController extends AbstractController
      */
     public function editAction(User $user, Request $request)
     {
-        if ($this->securityService->verifyAccess()) {
+        if (
+            $this->securityService->isAccessVerificationRole(
+                'error',
+                "Vous n'avez pas le rôle néccessaire pour accéder à cette page",
+                'ROLE_USER'
+            )
+        ) {
             return $this->redirectToRoute('task_list');
         }
+
         $route_name = $request->get('_route');
 
         $formUser = $this->formService->getUserForm($request, $user);
-
-        if ($this->userService->crudTaskManagement($formUser, $user, $route_name)) {
+        if ($this->userService->crudUserManagement($formUser, $user, $route_name)) {
             $this->addFlash('success', "L'utilisateur a bien été modifié");
 
             return $this->redirectToRoute('user_list');

@@ -2,9 +2,9 @@
 
 {% block body %}
     <div class="row">
-        {{ form_start(form, {'action' : path('task_edit', { 'id' : task.id })}) }}
-            {{ form_widget(form) }}
-
+        {{ form_start(form, {'attr': {'novalidate': 'novalidate' , 'action' : path('task_edit', { 'id' : task.id })}}) }}
+            {{ form_row(form.title) }}
+            {{ form_row(form.content) }}
             <button type="submit" class="btn btn-success">Modifier</button>
         {{ form_end(form) }}
     </div>

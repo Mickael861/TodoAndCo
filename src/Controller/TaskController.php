@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Task;
 use App\Service\FormService;
 use App\Service\TaskService;
+use App\Service\SecurityService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,11 +29,21 @@ class TaskController extends AbstractController
      */
     private $formService;
 
-    public function __construct(ManagerRegistry $manager, TaskService $taskService, FormService $formService)
-    {
+    /**
+     * @var SecurityService
+     */
+    private $securityService;
+
+    public function __construct(
+        ManagerRegistry $manager,
+        TaskService $taskService,
+        FormService $formService,
+        SecurityService $securityService
+    ) {
         $this->manager = $manager;
         $this->taskService = $taskService;
         $this->formService = $formService;
+        $this->securityService = $securityService;
     }
 
     /**
@@ -53,7 +64,6 @@ class TaskController extends AbstractController
         $task = new Task();
 
         $taskForm = $this->formService->getTaskForm($request, $task);
-
         if ($this->taskService->crudTaskManagement($taskForm, $task)) {
             $this->addFlash('success', 'La tâche a été bien été ajoutée.');
 
@@ -70,20 +80,26 @@ class TaskController extends AbstractController
      */
     public function editAction(Task $task, Request $request): Response
     {
-        $route_name = $request->get('_route');
+        if ($this->taskService->isBelongsUser($task)) {
+            $route_name = $request->get('_route');
 
-        $taskForm = $this->formService->getTaskForm($request, $task);
+            $taskForm = $this->formService->getTaskForm($request, $task);
 
-        if ($this->taskService->crudTaskManagement($taskForm, $task, $route_name)) {
-            $this->addFlash('success', 'La tâche a bien été modifiée.');
+            if ($this->taskService->crudTaskManagement($taskForm, $task, $route_name)) {
+                $this->addFlash('success', 'La tâche a bien été modifiée.');
 
-            return $this->redirectToRoute('task_list');
+                return $this->redirectToRoute('task_list');
+            }
+
+            return $this->render('task/edit.html.twig', [
+                'form' => $taskForm->createView(),
+                'task' => $task,
+            ]);
         }
 
-        return $this->render('task/edit.html.twig', [
-            'form' => $taskForm->createView(),
-            'task' => $task,
-        ]);
+        $this->addFlash('error', sprintf('Vous ne pouvez pas modifier cette tâche, elle ne vous appartient pas'));
+
+        return $this->redirectToRoute('task_list');
     }
 
     /**
@@ -91,11 +107,17 @@ class TaskController extends AbstractController
      */
     public function toggleTaskAction(Task $task): Response
     {
-        $this->taskService->toggleTask($task);
+        if ($this->taskService->isBelongsUser($task)) {
+            $this->taskService->toggleTask($task);
 
-        $is_done = $task->isDone() ? 'faite' : 'non terminée';
+            $is_done = $task->isDone() ? 'faite' : 'non terminée';
 
-        $this->addFlash('success', sprintf('La tâche %s a bien été marquée comme %s.', $task->getTitle(), $is_done));
+            $this->addFlash('success', sprintf('La tâche %s a bien été marquée comme %s.', $task->getTitle(), $is_done));
+
+            return $this->redirectToRoute('task_list');
+        }
+
+        $this->addFlash('error', sprintf('Vous ne pouvez pas modifier cette tâche, elle ne vous appartient pas'));
 
         return $this->redirectToRoute('task_list');
     }
@@ -105,9 +127,19 @@ class TaskController extends AbstractController
      */
     public function deleteTaskAction(Task $task): Response
     {
-        $this->taskService->deleteTask($task);
+        if (
+            $this->securityService->isVerifyAccess(null, null, 'ROLE_ADMIN') && $task->isTaskUserAnonymous() ||
+            $this->taskService->isBelongsUser($task)
+        ) {
+            dd('test');
+            $this->taskService->deleteTask($task);
 
-        $this->addFlash('success', 'La tâche a bien été supprimée.');
+            $this->addFlash('success', 'La tâche a bien été supprimée.');
+
+            return $this->redirectToRoute('task_list');
+        }
+
+        $this->addFlash('error', sprintf('Vous ne pouvez pas supprimer cette tâche, elle ne vous appartient pas'));
 
         return $this->redirectToRoute('task_list');
     }

@@ -16,7 +16,9 @@ class SecurityController extends AbstractController
      */
     public function loginAction(AuthenticationUtils $authenticationUtils, SecurityService $securityService): Response
     {
-        if ($securityService->isConnectedUser()) {
+        if (!empty($this->getUser())) {
+            $this->addFlash('error', "Vous êtes déjà connecté");
+
             return $this->redirectToRoute('task_list');
         }
 
