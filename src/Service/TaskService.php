@@ -105,26 +105,6 @@ class TaskService extends AbstractController
     }
 
     /**
-     * Checks whether or not the task belongs to a connected user
-     *
-     * @param  Taksk $task Entity Task
-     * @return bool true if the task belongs to the connected user, false otherwise
-     */
-    public function isBelongsUser(Task $task): bool
-    {
-        /**
-         * @var User
-         */
-        $user = $this->getUser();
-
-        if ($user->getId() === $task->getUser()->getId()) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
      * Retrieve completed or in-progress tasks
      *
      * @param  Request $request The request
