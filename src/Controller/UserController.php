@@ -8,6 +8,7 @@ use App\Service\UserService;
 use App\Service\SecurityService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -34,16 +35,21 @@ class UserController extends AbstractController
      */
     private $formService;
 
+    /**
+     * @var Security
+     */
+    private $security;
+
     public function __construct(
         ManagerRegistry $managerRegistry,
-        SecurityService $securityService,
         UserService $userService,
-        FormService $formService
+        FormService $formService,
+        Security $security
     ) {
         $this->managerRegistry = $managerRegistry;
-        $this->securityService = $securityService;
         $this->userService = $userService;
         $this->formService = $formService;
+        $this->security = $security;
     }
 
     /**
@@ -51,15 +57,9 @@ class UserController extends AbstractController
      */
     public function listAction(): Response
     {
-        if (
-            $this->securityService->isAccessVerificationRole(
-                'error',
-                "Vous n'avez pas le rôle néccessaire pour accéder à cette page",
-                'ROLE_USER'
-            )
-        ) {
-            return $this->redirectToRoute('task_list');
-        }
+        $user = $this->security->getUser();
+
+        $this->denyAccessUnlessGranted('ROLE_ADMIN', $user);
 
         return $this->render('user/list.html.twig', [
             'users' => $this->managerRegistry->getRepository(User::class)->findAll()
@@ -71,15 +71,9 @@ class UserController extends AbstractController
      */
     public function createAction(Request $request)
     {
-        if (
-            $this->securityService->isAccessVerificationRole(
-                'error',
-                "Vous n'avez pas le rôle néccessaire pour accéder à cette page",
-                'ROLE_USER'
-            )
-        ) {
-            return $this->redirectToRoute('task_list');
-        }
+        $user = $this->security->getUser();
+
+        $this->denyAccessUnlessGranted('ROLE_ADMIN', $user);
 
         $user = new User();
 
@@ -98,15 +92,7 @@ class UserController extends AbstractController
      */
     public function editAction(User $user, Request $request)
     {
-        if (
-            $this->securityService->isAccessVerificationRole(
-                'error',
-                "Vous n'avez pas le rôle néccessaire pour accéder à cette page",
-                'ROLE_USER'
-            )
-        ) {
-            return $this->redirectToRoute('task_list');
-        }
+        $this->denyAccessUnlessGranted('ROLE_ADMIN', $user);
 
         $route_name = $request->get('_route');
 

@@ -105,26 +105,6 @@ class TaskService extends AbstractController
     }
 
     /**
-     * Checks whether or not the task belongs to a connected user
-     *
-     * @param  Taksk $task Entity Task
-     * @return bool true if the task belongs to the connected user, false otherwise
-     */
-    public function isBelongsUser(Task $task): bool
-    {
-        /**
-         * @var User
-         */
-        $user = $this->getUser();
-
-        if ($user->getId() === $task->getUser()->getId()) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
      * Retrieve completed or in-progress tasks
      *
      * @param  Request $request The request
@@ -132,12 +112,14 @@ class TaskService extends AbstractController
      */
     public function getTaskToggle(Request $request): array
     {
-        $task = new \stdClass();
-        $task_completed = true;
+        $task = [];
 
-        if ($request->get('completed') === null || $request->get('completed') > 1) {
+        if (empty($request->get('completed')) || $request->get('completed') > 1) {
             $task = $this->managerRegistry->getRepository(Task::class)->findAll();
-        } else {
+        }
+
+        if (empty($task)) {
+            $task_completed = true;
             if ((int) $request->get('completed') === 0) {
                 $task_completed = false;
             }
