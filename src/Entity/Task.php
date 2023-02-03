@@ -45,6 +45,12 @@ class Task
      */
     private $user;
 
+    /**
+     * @ORM\Column(type="string", length=100)
+     * @Assert\NotBlank(message="Vous devez saisir un auteur.")
+     */
+    private $author;
+
     public function __construct()
     {
         $this->createdAt = new \Datetime();
@@ -112,6 +118,18 @@ class Task
     public function setUser(?user $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getAuthor(): ?string
+    {
+        return $this->author;
+    }
+
+    public function setAuthor(string $author): self
+    {
+        $this->author = $author;
 
         return $this;
     }

@@ -36,10 +36,12 @@
                         <p>{{ task.content|nl2br }}</p>
                     </div>
                     <hr>
-                    <div class="d-flex justify-content-evenly align-items-center">
+                    <div class="d-flex justify-content-evenly align-items-center flex-wrap">
                         <div>
                             {% if task.user != null %}
-                            <p> <span class='fw-bolder'> Auteur </span> : {{ task.user.username }} </p>
+                            <div class="d-flex text-center p-2 text-break">
+                                <p> <span class='fw-bolder'> Auteur </span> : {{ task.author }} </p>
+                            </div>
                             {% else %}
                             <div class='d-flex align-items-center'>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-exclamation-triangle-fill mb-3" viewBox="0 0 16 16">

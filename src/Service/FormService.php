@@ -17,10 +17,11 @@ class FormService extends AbstractController
      *
      * @param  Request $request request
      * @param  Task $task Entity Task
+     * @param  array[] $options the options to pass to the form
      */
-    public function getTaskForm(Request $request, Task $task): FormInterface
+    public function getTaskForm(Request $request, Task $task, array $options = []): FormInterface
     {
-        $form = $this->createForm(TaskType::class, $task);
+        $form = $this->createForm(TaskType::class, $task, $options);
         $form->handleRequest($request);
 
         return $form;

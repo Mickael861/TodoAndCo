@@ -37,7 +37,8 @@ class AppFixtures extends Fixture
             ->setCreatedAt(new DateTime())
             ->setTitle("TitreAnonyme")
             ->setContent("Une tache anonyme")
-            ->toggle(array_rand($toggle));
+            ->toggle(array_rand($toggle))
+            ->setAuthor("Anonymous");
 
         $manager->persist($task);
         $manager->flush();
@@ -57,7 +58,8 @@ class AppFixtures extends Fixture
             ->setTitle("Titre$iterator")
             ->setContent("Une tache n°$iterator")
             ->toggle(array_rand($toggle))
-            ->setUser($user);
+            ->setUser($user)
+            ->setAuthor("Laurent");
 
         $manager->persist($task);
         $manager->flush();
