@@ -24,7 +24,7 @@ class UserType extends AbstractType
                 'invalid_message' => 'Les deux mots de passe doivent correspondre.',
                 'required' => true,
                 'first_options'  => ['label' => 'Mot de passe'],
-                'second_options' => ['label' => 'Tapez le mot de passe à nouveau'],
+                'second_options' => ['label' => 'Tapez le mot de passe à nouveau']
             ])
             ->add('roles', ChoiceType::class, [
                 'data' => 'ROLE_USER',
