@@ -113,14 +113,15 @@ class TaskService extends AbstractController
     public function getTaskToggle(Request $request): array
     {
         $task = [];
+        $values_expected = ['0', '1'];
 
-        if (empty($request->get('completed')) || $request->get('completed') > 1) {
+        if (!in_array($request->get('completed'), $values_expected)) {
             $task = $this->managerRegistry->getRepository(Task::class)->findAll();
         }
 
         if (empty($task)) {
             $task_completed = true;
-            if ((int) $request->get('completed') === 0) {
+            if ($request->get('completed') === '0') {
                 $task_completed = false;
             }
 
