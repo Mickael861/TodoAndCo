@@ -39,7 +39,7 @@ class TaskController extends AbstractController
     }
 
     /**
-     * @Route("/tasks/{is_done}", name="task_list")
+     * @Route("/tasks/list/{is_done}", name="task_list")
      */
     public function listAction(string $is_done): Response
     {

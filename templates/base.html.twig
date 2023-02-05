@@ -38,6 +38,10 @@
                 <a href="{{ path('user_list') }}" class="btn btn-primary btn-home-page">Gestion des utilisateurs</a>
                 {% endif %}
 
+                {% if app.user and 'homepage' != app.request.attributes.get('_route') %}
+                <a href="{{ path('homepage') }}" class="btn btn-warning btn-home-page">Accueil</a>
+                {% endif %}
+
                 {% if app.user %}
                 <a href="{{ path('logout') }}" class="btn btn-danger btn-home-page">Se déconnecter</a>
                 {% endif %}
