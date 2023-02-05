@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Entity\Task;
 use App\Service\FormService;
 use App\Service\TaskService;
-use App\Service\SecurityService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -40,11 +39,15 @@ class TaskController extends AbstractController
     }
 
     /**
-     * @Route("/tasks", name="task_list")
+     * @Route("/tasks/{is_done}", name="task_list")
      */
-    public function listAction(Request $request): Response
+    public function listAction(string $is_done): Response
     {
-        $task = $this->taskService->getTaskToggle($request);
+        /**
+         * @var ObjectRepository
+         */
+        $repository = $this->manager->getRepository(Task::class);
+        $task = $repository->findTaskList($is_done);
 
         return $this->render('task/list.html.twig', [
             'tasks' => $task
