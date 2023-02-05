@@ -34,11 +34,11 @@ class TaskRepository extends ServiceEntityRepository
 
         switch ($is_done) {
             case 'ended':
-                $result = false;
+                $result = true;
 
                 break;
             case 'progress':
-                $result = true;
+                $result = false;
 
                 break;
             default:
