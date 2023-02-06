@@ -36,15 +36,18 @@ class UserService
     public function crudUserManagement(FormInterface $form, User $user, string $route_name = 'user_create'): bool
     {
         $success = false;
-
         if ($form->isSubmitted() && $form->isValid()) {
+            $user_password = $form->get('user_password')->getData();
+
             switch ($route_name) {
                 case 'user_edit':
-                    $this->updateUser($user);
+                    $hashedPassword = $this->userPasswordManagement($user, $user_password, $route_name);
+                    $this->updateUser($user, $hashedPassword);
 
                     break;
                 default:
-                    $this->createUser($user);
+                    $hashedPassword = $this->userPasswordManagement($user, $user_password, $route_name);
+                    $this->createUser($user, $hashedPassword);
 
                     break;
             }
@@ -56,16 +59,35 @@ class UserService
     }
 
     /**
+     * User password management
+     *
+     * @param  User $user User
+     * @param  ?string $user_password User password
+     * @param  string $route_name Name of the route
+     *
+     * @return string Password Hasher
+     */
+    private function userPasswordManagement(User $user, ?string $user_password, string $route_name): string
+    {
+        if ($route_name === 'user_edit' && is_null($user_password)) {
+            return $user->getPassword();
+        }
+
+        return $this->passwordHasher->hashPassword(
+            $user,
+            $user_password
+        );
+    }
+
+    /**
      * Managing the modification of a user
      *
+     * @param  User $user User
+     * @param  string $hashedPassword Password Hasher
      * @return void
      */
-    private function updateUser(User $user): void
+    private function updateUser(User $user, string $hashedPassword): void
     {
-        $hashedPassword = $this->passwordHasher->hashPassword(
-            $user,
-            $user->getPassword()
-        );
         $user->setPassword($hashedPassword);
 
         $this->managerRegistry->getManager()->flush();
@@ -74,16 +96,13 @@ class UserService
     /**
      * user backup management
      *
-     * @param User $user Entity user
+     * @param  User $user user
+     * @param  string $hashedPassword Password Hasher
      * @return void
      */
-    private function createUser(User $user): void
+    private function createUser(User $user, string $hashedPassword): void
     {
         $entityManager = $this->managerRegistry->getManager();
-        $hashedPassword = $this->passwordHasher->hashPassword(
-            $user,
-            $user->getPassword()
-        );
 
         $user->setPassword($hashedPassword);
 

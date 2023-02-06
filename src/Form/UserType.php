@@ -12,6 +12,7 @@ use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class UserType extends AbstractType
 {
@@ -19,7 +20,12 @@ class UserType extends AbstractType
     {
         $builder
             ->add('username', TextType::class, ['label' => "Nom d'utilisateur"])
-            ->add('password', RepeatedType::class, [
+            ->add('user_password', RepeatedType::class, [
+                'mapped' => false,
+                'constraints' => is_null($options['data']->getId()) ? [new NotBlank(
+                    [],
+                    'Vous devez saisir un mot de passe.'
+                )] : [],
                 'type' => PasswordType::class,
                 'invalid_message' => 'Les deux mots de passe doivent correspondre.',
                 'required' => true,
@@ -38,11 +44,8 @@ class UserType extends AbstractType
 
         $builder->get('roles')
             ->addModelTransformer(new CallbackTransformer(
-                //No need to Transform the original value into a format that will be used to render the field
-                //There will remain a character string
                 function () {
                 },
-                //Transformation of the roles string into roles array to correspond to the entity
                 function ($rolesAsArray) {
                     return ['ROLE' => $rolesAsArray];
                 }
@@ -53,7 +56,7 @@ class UserType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => User::class,
+            'data_class' => User::class
         ]);
     }
 }
