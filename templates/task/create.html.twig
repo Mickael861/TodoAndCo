@@ -2,10 +2,11 @@
 
 {% block body %}
     <div class="row">
-        <a href="{{ path('task_list') }}" class="btn btn-primary mb-4 btn-home-page m-auto">Retour à la liste des tâches</a>
+        <a href="{{ path('task_list', {'is_done': 'all' }) }}" class="btn btn-primary mb-4 btn-home-page m-auto">Retour à la liste des tâches</a>
         {{ form_start(form, {'attr': {'novalidate': 'novalidate' , 'action' : path('task_create')}}) }}
             {{ form_row(form.title) }}
             {{ form_row(form.content) }}
+            {{ form_row(form.author) }}
             <button type="submit" class="btn btn-success">Ajouter</button>
         {{ form_end(form) }}
     </div>

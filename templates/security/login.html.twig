@@ -2,16 +2,16 @@
 
 {% block body %}
     {% if error %}
-        <div class="alert alert-danger" role="alert">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+        <div class="alert alert-danger text-center" role="alert">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
     {% endif %}
 
-    <form action="{{ path('login_check') }}" method="post" id="form-login">
-        <label for="username">Nom d'utilisateur :</label>
-        <input type="text" id="username" name="_username" value="{{ last_username }}" />
+    <form action="{{ path('login_check') }}" method="post" id="form-login" class="d-flex flex-column mx-auto" style="width:240px">
+        <label for="username bolder">Nom d'utilisateur :</label>
+        <input class=" mb-3 border border-2 {% if error %} border-danger rounded {% else %} border-secondary rounded {% endif %}" type="text" id="username" name="_username" value="{{ last_username }}" />
 
         <label for="password">Mot de passe :</label>
-        <input type="password" id="password" name="_password" />
+        <input class="border border-2 border-secondary rounded {% if error %} border-danger rounded {% else %} border-secondary rounded {% endif %}" type="password" id="password" name="_password" />
 
-        <button class="btn btn-success" id="btn-form" type="submit">Se connecter</button>
+        <button class="btn btn-success mt-4" id="btn-form" type="submit">Se connecter</button>
     </form>
 {% endblock %}

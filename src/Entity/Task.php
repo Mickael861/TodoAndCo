@@ -3,10 +3,11 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\TaskRepository;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass=TaskRepository::class)
  * @ORM\Table
  */
 class Task
@@ -44,6 +45,12 @@ class Task
      * @ORM\ManyToOne(targetEntity=user::class, inversedBy="tasks")
      */
     private $user;
+
+    /**
+     * @ORM\Column(type="string", length=100)
+     * @Assert\NotBlank(message="Vous devez saisir un auteur.")
+     */
+    private $author;
 
     public function __construct()
     {
@@ -112,6 +119,18 @@ class Task
     public function setUser(?user $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getAuthor(): ?string
+    {
+        return $this->author;
+    }
+
+    public function setAuthor(string $author): self
+    {
+        $this->author = $author;
 
         return $this;
     }

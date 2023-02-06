@@ -103,33 +103,4 @@ class TaskService extends AbstractController
         $entityManager->persist($task);
         $entityManager->flush();
     }
-
-    /**
-     * Retrieve completed or in-progress tasks
-     *
-     * @param  Request $request The request
-     * @return array Tasks
-     */
-    public function getTaskToggle(Request $request): array
-    {
-        $task = [];
-        $values_expected = ['0', '1'];
-
-        if (!in_array($request->get('completed'), $values_expected)) {
-            $task = $this->managerRegistry->getRepository(Task::class)->findAll();
-        }
-
-        if (empty($task)) {
-            $task_completed = true;
-            if ($request->get('completed') === '0') {
-                $task_completed = false;
-            }
-
-            $task = $this->managerRegistry->getRepository(Task::class)->findBy([
-                'isDone' => $task_completed
-            ]);
-        }
-
-        return $task;
-    }
 }

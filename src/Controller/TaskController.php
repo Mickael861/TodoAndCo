@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Entity\Task;
 use App\Service\FormService;
 use App\Service\TaskService;
-use App\Service\SecurityService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -40,11 +39,15 @@ class TaskController extends AbstractController
     }
 
     /**
-     * @Route("/tasks", name="task_list")
+     * @Route("/tasks/list/{is_done}", name="task_list")
      */
-    public function listAction(Request $request): Response
+    public function listAction(string $is_done): Response
     {
-        $task = $this->taskService->getTaskToggle($request);
+        /**
+         * @var ObjectRepository
+         */
+        $repository = $this->manager->getRepository(Task::class);
+        $task = $repository->findTaskList($is_done);
 
         return $this->render('task/list.html.twig', [
             'tasks' => $task
@@ -62,7 +65,9 @@ class TaskController extends AbstractController
         if ($this->taskService->crudTaskManagement($taskForm, $task)) {
             $this->addFlash('success', 'La tâche a été bien été ajoutée.');
 
-            return $this->redirectToRoute('task_list');
+            return $this->redirectToRoute('task_list', [
+                'is_done' => 'progress'
+            ]);
         }
 
         return $this->render('task/create.html.twig', [
@@ -84,7 +89,11 @@ class TaskController extends AbstractController
         if ($this->taskService->crudTaskManagement($taskForm, $task, $route_name)) {
             $this->addFlash('success', 'La tâche a bien été modifiée.');
 
-            return $this->redirectToRoute('task_list');
+            $is_done = $task->isDone() ? 'ended' : 'progress';
+
+            return $this->redirectToRoute('task_list', [
+                'is_done' => $is_done
+            ]);
         }
 
         return $this->render('task/edit.html.twig', [
@@ -103,13 +112,16 @@ class TaskController extends AbstractController
         $this->taskService->toggleTask($task);
 
         $is_done = $task->isDone() ? 'faite' : 'non terminée';
+        $parameter_is_done = $task->isDone() ? 'ended' : 'progress';
 
         $this->addFlash(
             'success',
             sprintf('La tâche %s a bien été marquée comme %s.', $task->getTitle(), $is_done)
         );
 
-        return $this->redirectToRoute('task_list');
+        return $this->redirectToRoute('task_list', [
+            'is_done' => $parameter_is_done
+        ]);
     }
 
     /**
@@ -123,6 +135,10 @@ class TaskController extends AbstractController
 
         $this->addFlash('success', 'La tâche a bien été supprimée.');
 
-        return $this->redirectToRoute('task_list');
+        $is_done = $task->isDone() ? 'ended' : 'progress';
+
+        return $this->redirectToRoute('task_list', [
+            'is_done' => $is_done
+        ]);
     }
 }

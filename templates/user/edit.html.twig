@@ -7,11 +7,26 @@
     <div class="row">
         {{ form_start(form, {'attr': {'novalidate': 'novalidate' , 'action' : path('user_edit', { 'id' : user.id })}}) }}
             {{ form_row(form.username) }}
-            {{ form_row(form.password.first) }}
-            {{ form_row(form.password.second) }}
             {{ form_row(form.email) }}
             {{ form_row(form.roles) }}
-        <button type="submit" class="btn btn-success">Modifier</button>
+
+            <div class="d-flex justify-content-center py-3">
+                <div class="btn btn-primary" id="btn-password">Modifier le mot de passe</div>
+            </div>
+
+            <div class="d-none" id="container-password">
+                {{ form_row(form.user_password.first) }}
+                {{ form_row(form.user_password.second) }}
+            </div>
+
+            <button type="submit" class="btn btn-success">Modifier</button>
+
         {{ form_end(form) }}
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script src="{{ asset('js/user_edit.js') }}"></script>
 {% endblock %}

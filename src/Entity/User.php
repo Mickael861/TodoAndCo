@@ -63,6 +63,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $tasks;
 
+    /**
+     * @var string
+     */
+    private $user_password;
+
     public function __construct()
     {
         $this->tasks = new ArrayCollection();
@@ -179,6 +184,26 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $task->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * Get the value of user_passowrd
+     */
+    public function getUserPassword(): string
+    {
+        return $this->user_password;
+    }
+
+    /**
+     * Set the value of user_passowrd
+     *
+     * @return  self
+     */
+    public function setUserPassword(string $user_password): self
+    {
+        $this->user_password = $user_password;
 
         return $this;
     }
