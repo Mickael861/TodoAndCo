@@ -21,11 +21,6 @@ class UserController extends AbstractController
     private $managerRegistry;
 
     /**
-     * @var SecurityService
-     */
-    private $securityService;
-
-    /**
      * @var UserService
      */
     private $userService;
