@@ -49,8 +49,11 @@ class TaskController extends AbstractController
         $repository = $this->manager->getRepository(Task::class);
         $task = $repository->findTaskList($is_done);
 
+        $type_task = $this->taskService->getTypeTask($is_done);
+
         return $this->render('task/list.html.twig', [
-            'tasks' => $task
+            'tasks' => $task,
+            'type_task' => $type_task
         ]);
     }
 

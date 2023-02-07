@@ -1,5 +1,9 @@
 {% extends 'base.html.twig' %}
 
+{% block header_title %}
+    <h1 class='text-center'>Liste des tâches {{ type_task }}</h1>
+{% endblock %}
+
 {% block header_img %}<img class="slide-image" src="{{ asset('img/todolist_content.jpg') }}" alt="todo list">{% endblock %}
 
 {% block body %}
@@ -58,14 +62,14 @@
                     <div class="d-flex flex-row p-3 border bg-light bg-gradient {% if task.user == null or task.user.id != app.user.id %} justify-content-center {% else %} justify-content-between {% endif %}">
                         {% if is_granted('TASK_TOGGLE', task) %}
                         <form action="{{ path('task_toggle', {'id' : task.id }) }}">
-                            <button class="btn btn-success btn-sm">
+                            <button class="btn btn-success btn-sm" id="btn-toggle-{{ task.id }}">
                                 {% if not task.isDone %}Marquer comme faite{% else %}Marquer non terminée{% endif %}
                             </button>
                         </form>
                         {% endif %}
                         {% if is_granted('TASK_DELETE', task) %}
                         <form action="{{ path('task_delete', {'id' : task.id }) }}">
-                            <button class="btn btn-danger btn-sm">Supprimer</button>
+                            <button class="btn btn-danger btn-sm" id="btn-delete-{{ task.id }}">Supprimer</button>
                         </form>
                         {% endif %}
                     </div>
@@ -74,7 +78,7 @@
         </div>
         {% else %}
             <div class="alert alert-warning text-center m-2" role="alert">
-                Il n'y a pas encore de tâche enregistrée.
+                Il n'y a pas encore de tâche {{ type_task }}.
             </div>
         {% endfor %}
     </div>

@@ -21,6 +21,7 @@ class AppFixtures extends Fixture
     public function load(ObjectManager $manager): void
     {
         $this->createDatas($manager);
+        $this->createTask($manager);
         $this->createTaskAnonymous($manager);
     }
 
@@ -44,24 +45,29 @@ class AppFixtures extends Fixture
         $manager->flush();
     }
 
-    private function createTask(ObjectManager $manager, User $user, int $iterator)
+    private function createTask(ObjectManager $manager)
     {
         $toggle = [
-            true,
-            false
+            '0' => true,
+            '1' => false
         ];
 
-        $task = new Task();
+        $user = $manager->getRepository(User::class)->findAll();
 
-        $task
-            ->setCreatedAt(new DateTime())
-            ->setTitle("Titre$iterator")
-            ->setContent("Une tache n°$iterator")
-            ->toggle(array_rand($toggle))
-            ->setUser($user)
-            ->setAuthor("Laurent");
+        for ($iterator = 0; $iterator <= 1; $iterator++) {
+            $task = new Task();
 
-        $manager->persist($task);
+            $task
+                ->setCreatedAt(new DateTime())
+                ->setTitle("Titre$iterator")
+                ->setContent("Une tache n°$iterator")
+                ->toggle($toggle[$iterator])
+                ->setUser($user[0])
+                ->setAuthor("Laurent");
+
+            $manager->persist($task);
+        }
+
         $manager->flush();
     }
 
@@ -87,9 +93,8 @@ class AppFixtures extends Fixture
                 ->setRoles($roles[$iterator]);
 
             $manager->persist($user);
-            $manager->flush();
-
-            $this->createTask($manager, $user, $iterator);
         }
+
+        $manager->flush();
     }
 }

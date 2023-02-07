@@ -103,4 +103,30 @@ class TaskService extends AbstractController
         $entityManager->persist($task);
         $entityManager->flush();
     }
+
+    /**
+     * get type of task
+     *
+     * @param  string $is_done Type of task
+     * @return string Type of task
+     */
+    public function getTypeTask(string $is_done): string
+    {
+        switch ($is_done) {
+            case 'ended':
+                $type_task = "terminées";
+
+                break;
+            case 'progress':
+                $type_task = "en cours";
+
+                break;
+            default:
+                $type_task = '';
+
+                break;
+        }
+
+        return $type_task;
+    }
 }

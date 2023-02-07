@@ -1,12 +1,17 @@
 {% extends 'base.html.twig' %}
 
+{% block header_title %}
+    <h1 class='text-center'>Modification d'une tâche</h1>
+{% endblock %}
+
 {% block body %}
     <div class="row">
+        <a href="{{ path('task_list', {'is_done': 'all' }) }}" class="btn btn-primary mb-4 btn-home-page m-auto">Retour à la liste des tâches</a>
         {{ form_start(form, {'attr': {'novalidate': 'novalidate' , 'action' : path('task_edit', { 'id' : task.id })}}) }}
             {{ form_row(form.title) }}
             {{ form_row(form.content) }}
             {{ form_row(form.author) }}
-            <button type="submit" class="btn btn-success">Modifier</button>
+            <button type="submit" class="btn btn-success" id="btn-form">Modifier</button>
         {{ form_end(form) }}
     </div>
 {% endblock %}
