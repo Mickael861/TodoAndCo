@@ -145,11 +145,9 @@ class TaskListTest extends WebTestCase
 
         $crawler = $this->getClientRequestTaskList(['is_done' => 'ended']);
 
-        $taskRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(Task::class);
-        $id_task = $taskRepository->findByTitle("Titre0")[0]->getId();
+        $id_task = $this->getTitleTaskId("Titre0");
 
-        $form = $crawler->selectButton("btn-toggle-$id_task")->form([]);
-        $this->client->submit($form);
+        $this->submitForm($crawler, "btn-toggle-$id_task");
 
         $this->client->followRedirect();
 
@@ -170,11 +168,9 @@ class TaskListTest extends WebTestCase
 
         $crawler = $this->getClientRequestTaskList(['is_done' => 'progress']);
 
-        $taskRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(Task::class);
-        $id_task = $taskRepository->findByTitle("Titre1")[0]->getId();
+        $id_task = $this->getTitleTaskId("Titre1");
 
-        $form = $crawler->selectButton("btn-toggle-$id_task")->form([]);
-        $this->client->submit($form);
+        $this->submitForm($crawler, "btn-toggle-$id_task");
 
         $this->client->followRedirect();
 
@@ -195,11 +191,9 @@ class TaskListTest extends WebTestCase
 
         $crawler = $this->getClientRequestTaskList(['is_done' => 'all']);
 
-        $taskRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(Task::class);
-        $id_task = $taskRepository->findByTitle("Titre0")[0]->getId();
+        $id_task = $this->getTitleTaskId("Titre0");
 
-        $form = $crawler->selectButton("btn-delete-$id_task")->form([]);
-        $this->client->submit($form);
+        $this->submitForm($crawler, "btn-delete-$id_task");
 
         $this->client->followRedirect();
 
@@ -232,9 +226,34 @@ class TaskListTest extends WebTestCase
      * @param  string $text_link Textual content of the link
      * @return void
      */
-    private function setLinkClick(Crawler $crawler, string $text_link)
+    private function setLinkClick(Crawler $crawler, string $text_link): void
     {
         $link = $crawler->selectLink($text_link)->link();
         $this->client->click($link);
+    }
+
+    /**
+     * Retrieve the identifier of a task in relation to its title
+     *
+     * @param  string $title_name name of the title task
+     * @return int Identifier task
+     */
+    private function getTitleTaskId(string $title_name): int
+    {
+        $taskRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(Task::class);
+        return $taskRepository->findByTitle($title_name)[0]->getId();
+    }
+
+    /**
+     * submit a form
+     *
+     * @param  Crawler $crawler Crawler
+     * @param  string $selecter Selector of the button form
+     * @return void
+     */
+    private function submitForm(Crawler $crawler, string $selector): void
+    {
+        $form = $crawler->selectButton($selector)->form([]);
+        $this->client->submit($form);
     }
 }
