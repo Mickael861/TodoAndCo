@@ -1,5 +1,9 @@
 {% extends 'base.html.twig' %}
 
+{% block header_title %}
+    <h1 class='text-center'>Modification d'une tâche</h1>
+{% endblock %}
+
 {% block body %}
     <div class="row">
         {{ form_start(form, {'attr': {'novalidate': 'novalidate' , 'action' : path('task_edit', { 'id' : task.id })}}) }}

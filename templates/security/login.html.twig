@@ -1,5 +1,9 @@
 {% extends 'base.html.twig' %}
 
+{% block header_title %}
+    <h1 class='text-center'>S'identifier</h1>
+{% endblock %}
+
 {% block body %}
     {% if error %}
         <div class="alert alert-danger text-center" role="alert">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
