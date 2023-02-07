@@ -143,11 +143,7 @@ class TaskListTest extends WebTestCase
     {
         $this->client->loginUser($this->user);
 
-        $crawler = $this->getClientRequestTaskList(['is_done' => 'ended']);
-
-        $id_task = $this->getTitleTaskId("Titre0");
-
-        $this->submitForm($crawler, "btn-toggle-$id_task");
+        $this->submitFormTaskId(['is_done' => 'ended'], "Titre0", "btn-toggle");
 
         $this->client->followRedirect();
 
@@ -166,11 +162,7 @@ class TaskListTest extends WebTestCase
     {
         $this->client->loginUser($this->user);
 
-        $crawler = $this->getClientRequestTaskList(['is_done' => 'progress']);
-
-        $id_task = $this->getTitleTaskId("Titre1");
-
-        $this->submitForm($crawler, "btn-toggle-$id_task");
+        $this->submitFormTaskId(['is_done' => 'progress'], "Titre1", "btn-toggle");
 
         $this->client->followRedirect();
 
@@ -189,11 +181,7 @@ class TaskListTest extends WebTestCase
     {
         $this->client->loginUser($this->user);
 
-        $crawler = $this->getClientRequestTaskList(['is_done' => 'all']);
-
-        $id_task = $this->getTitleTaskId("Titre0");
-
-        $this->submitForm($crawler, "btn-delete-$id_task");
+        $this->submitFormTaskId(['is_done' => 'all'], "Titre0", "btn-delete");
 
         $this->client->followRedirect();
 
@@ -255,5 +243,24 @@ class TaskListTest extends WebTestCase
     {
         $form = $crawler->selectButton($selector)->form([]);
         $this->client->submit($form);
+    }
+
+    /**
+     * submit form with task identifier
+     *
+     * @param  array $parameter_url Parameter to pass to the url
+     * @param  string $title_task Title of the task
+     * @param  string $selector_btn_form The form button selector
+     * @return void
+     */
+    private function submitFormTaskId(array $parameter_url, string $title_task, string $selector_btn_form): void
+    {
+        $crawler = $this->getClientRequestTaskList($parameter_url);
+
+        $id_task = $this->getTitleTaskId($title_task);
+
+        $selector_completed = $selector_btn_form . '-' . $id_task;
+
+        $this->submitForm($crawler, $selector_completed);
     }
 }
