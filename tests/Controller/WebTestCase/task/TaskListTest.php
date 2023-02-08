@@ -1,12 +1,12 @@
 <?php
 
-namespace Tests\Controller\WebTestCase\task;
+namespace tests\Controller\WebTestCase\task;
 
 use App\Entity\Task;
 use App\Entity\User;
-use Symfony\Component\DomCrawler\Crawler;
-use Symfony\Component\HttpFoundation\Request;
+use App\TestsHelper\WebTestCaseHelper;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class TaskListTest extends WebTestCase
@@ -26,14 +26,26 @@ class TaskListTest extends WebTestCase
      */
     private $user;
 
+    /**
+     * @var User
+     */
+    private $admin;
+
+    /**
+     * @var WebTestCaseHelper
+     */
+    private $webTestCaseHelper;
+
     public function setUp(): void
     {
         $this->client = static::createClient();
 
         $this->urlGenerator = $this->client->getContainer()->get('router.default');
 
-        $userRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
-        $this->user = $userRepository->findByUsername("user0")[0];
+        $this->webTestCaseHelper = new WebTestCaseHelper($this->client, $this->urlGenerator);
+
+        $this->user = $this->webTestCaseHelper->getEntity(User::class, 'findByUsername', 'user0');
+        $this->admin = $this->webTestCaseHelper->getEntity(User::class, 'findByUsername', 'user1');
     }
 
     /**
@@ -41,7 +53,7 @@ class TaskListTest extends WebTestCase
      */
     public function testListActionUserNoLogged()
     {
-        $this->getClientRequestTaskList(['is_done' => 'all']);
+        $this->webTestCaseHelper->getClientRequest('task_list', ['is_done' => 'all']);
 
         $this->client->followRedirect();
 
@@ -56,7 +68,7 @@ class TaskListTest extends WebTestCase
     {
         $this->client->loginUser($this->user);
 
-        $this->getClientRequestTaskList(['is_done' => 'all']);
+        $this->webTestCaseHelper->getClientRequest('task_list', ['is_done' => 'all']);
 
         $this->assertSelectorTextContains('h1', "Liste des tâches");
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
@@ -69,7 +81,7 @@ class TaskListTest extends WebTestCase
     {
         $this->client->loginUser($this->user);
 
-        $this->getClientRequestTaskList(['is_done' => 'ended']);
+        $this->webTestCaseHelper->getClientRequest('task_list', ['is_done' => 'ended']);
 
         $this->assertSelectorTextContains('h1', "Liste des tâches terminée");
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
@@ -82,7 +94,7 @@ class TaskListTest extends WebTestCase
     {
         $this->client->loginUser($this->user);
 
-        $this->getClientRequestTaskList(['is_done' => 'progress']);
+        $this->webTestCaseHelper->getClientRequest('task_list', ['is_done' => 'progress']);
 
         $this->assertSelectorTextContains('h1', "Liste des tâches en cours");
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
@@ -95,9 +107,9 @@ class TaskListTest extends WebTestCase
     {
         $this->client->loginUser($this->user);
 
-        $crawler = $this->getClientRequestTaskList(['is_done' => 'all']);
+        $crawler = $this->webTestCaseHelper->getClientRequest('task_list', ['is_done' => 'all']);
 
-        $this->setLinkClick($crawler, 'Accueil');
+        $this->webTestCaseHelper->setLinkClick($crawler, 'Accueil');
 
         $this->assertSelectorTextContains(
             'h1',
@@ -113,9 +125,9 @@ class TaskListTest extends WebTestCase
     {
         $this->client->loginUser($this->user);
 
-        $crawler = $this->getClientRequestTaskList(['is_done' => 'all']);
+        $crawler = $this->webTestCaseHelper->getClientRequest('task_list', ['is_done' => 'all']);
 
-        $this->setLinkClick($crawler, 'Créer une tâche');
+        $this->webTestCaseHelper->setLinkClick($crawler, 'Créer une tâche');
 
         $this->assertSelectorTextContains('h1', "Création d'une tâche");
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
@@ -128,9 +140,9 @@ class TaskListTest extends WebTestCase
     {
         $this->client->loginUser($this->user);
 
-        $crawler = $this->getClientRequestTaskList(['is_done' => 'all']);
+        $crawler = $this->webTestCaseHelper->getClientRequest('task_list', ['is_done' => 'all']);
 
-        $this->setLinkClick($crawler, 'Titre0');
+        $this->webTestCaseHelper->setLinkClick($crawler, 'Titre0');
 
         $this->assertSelectorTextContains('h1', "Modification d'une tâche");
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
@@ -143,7 +155,7 @@ class TaskListTest extends WebTestCase
     {
         $this->client->loginUser($this->user);
 
-        $this->submitFormTaskId(['is_done' => 'ended'], "Titre0", "btn-toggle");
+        $this->submitFormTaskId('task_list', ['is_done' => 'ended'], "Titre0", "btn-toggle");
 
         $this->client->followRedirect();
 
@@ -160,9 +172,9 @@ class TaskListTest extends WebTestCase
      */
     public function testListActionBtnToggleProgressTask()
     {
-        $this->client->loginUser($this->user);
+        $this->client->loginUser($this->admin);
 
-        $this->submitFormTaskId(['is_done' => 'progress'], "Titre1", "btn-toggle");
+        $this->submitFormTaskId('task_list', ['is_done' => 'progress'], "Titre1", "btn-toggle");
 
         $this->client->followRedirect();
 
@@ -181,7 +193,7 @@ class TaskListTest extends WebTestCase
     {
         $this->client->loginUser($this->user);
 
-        $this->submitFormTaskId(['is_done' => 'all'], "Titre0", "btn-delete");
+        $this->submitFormTaskId('task_list', ['is_done' => 'all'], "Titre0", "btn-delete");
 
         $this->client->followRedirect();
 
@@ -194,73 +206,26 @@ class TaskListTest extends WebTestCase
     }
 
     /**
-     * Retrieve the crawler from the task list
-     *
-     * @param array $parameter URL parameter
-     * @return Crawler
-     */
-    private function getClientRequestTaskList(array $parameter = []): Crawler
-    {
-        return $this->client->request(
-            Request::METHOD_GET,
-            $this->urlGenerator->generate('task_list', $parameter)
-        );
-    }
-
-    /**
-     * Add a click on a link
-     *
-     * @param  Crawler $crawler Crawler
-     * @param  string $text_link Textual content of the link
-     * @return void
-     */
-    private function setLinkClick(Crawler $crawler, string $text_link): void
-    {
-        $link = $crawler->selectLink($text_link)->link();
-        $this->client->click($link);
-    }
-
-    /**
-     * Retrieve the identifier of a task in relation to its title
-     *
-     * @param  string $title_name name of the title task
-     * @return int Identifier task
-     */
-    private function getTitleTaskId(string $title_name): int
-    {
-        $taskRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(Task::class);
-        return $taskRepository->findByTitle($title_name)[0]->getId();
-    }
-
-    /**
-     * submit a form
-     *
-     * @param  Crawler $crawler Crawler
-     * @param  string $selecter Selector of the button form
-     * @return void
-     */
-    private function submitForm(Crawler $crawler, string $selector): void
-    {
-        $form = $crawler->selectButton($selector)->form([]);
-        $this->client->submit($form);
-    }
-
-    /**
      * submit form with task identifier
      *
+     * @param string $route_name Name of the route
      * @param  array $parameter_url Parameter to pass to the url
      * @param  string $title_task Title of the task
      * @param  string $selector_btn_form The form button selector
      * @return void
      */
-    private function submitFormTaskId(array $parameter_url, string $title_task, string $selector_btn_form): void
-    {
-        $crawler = $this->getClientRequestTaskList($parameter_url);
+    private function submitFormTaskId(
+        string $route_name,
+        array $parameter_url,
+        string $title_task,
+        string $selector_btn_form
+    ): void {
+        $crawler = $this->webTestCaseHelper->getClientRequest($route_name, $parameter_url);
 
-        $id_task = $this->getTitleTaskId($title_task);
+        $id_task = $this->webTestCaseHelper->getEntity(Task::class, 'findByTitle', $title_task)->getId();
 
         $selector_completed = $selector_btn_form . '-' . $id_task;
 
-        $this->submitForm($crawler, $selector_completed);
+        $this->webTestCaseHelper->submitForm($crawler, $selector_completed);
     }
 }

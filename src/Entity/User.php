@@ -54,9 +54,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @ORM\Column(type="json")
      */
-    private $roles = [
-        "ROLE" => "ROLE_USER"
-    ];
+    private $roles = [];
 
     /**
      * @ORM\OneToMany(targetEntity=Task::class, mappedBy="user", orphanRemoval=true)
