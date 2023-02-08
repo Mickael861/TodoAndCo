@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Controller\WebTestCase\task;
+namespace tests\Controller\WebTestCase\user;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 

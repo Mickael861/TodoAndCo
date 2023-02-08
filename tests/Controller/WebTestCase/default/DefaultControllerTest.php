@@ -1,8 +1,9 @@
 <?php
 
-namespace Tests\Controller\WebTestCase;
+namespace tests\Controller\WebTestCase\homepage;
 
 use App\Entity\User;
+use App\TestsHelper\WebTestCaseHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -19,11 +20,25 @@ class DefaultControllerTest extends WebTestCase
      */
     private $urlGenerator;
 
+    /**
+     * @var User
+     */
+    private $user;
+
+    /**
+     * @var WebTestCaseHelper
+     */
+    private $webTestCaseHelper;
+
     public function setUp(): void
     {
         $this->client = static::createClient();
 
         $this->urlGenerator = $this->client->getContainer()->get('router.default');
+
+        $this->webTestCaseHelper = new WebTestCaseHelper($this->client, $this->urlGenerator);
+
+        $this->user = $this->webTestCaseHelper->getEntity(User::class, 'findByUsername', 'user0');
     }
 
     /**
@@ -44,7 +59,7 @@ class DefaultControllerTest extends WebTestCase
      */
     public function testIndexUserLoggedNoRedirectLoginStatusCodeOK()
     {
-        $this->loginUser();
+        $this->client->loginUser($this->user);
 
         $this->client->request(Request::METHOD_GET, $this->urlGenerator->generate('homepage'));
 
@@ -60,7 +75,7 @@ class DefaultControllerTest extends WebTestCase
      */
     public function testIndexButtonAllTasks()
     {
-        $this->loginUser();
+        $this->client->loginUser($this->user);
 
         $crawler = $this->client->request(Request::METHOD_GET, $this->urlGenerator->generate('homepage'));
 
@@ -76,7 +91,7 @@ class DefaultControllerTest extends WebTestCase
      */
     public function testIndexButtonEndedTasks()
     {
-        $this->loginUser();
+        $this->client->loginUser($this->user);
 
         $crawler = $this->client->request(Request::METHOD_GET, $this->urlGenerator->generate('homepage'));
 
@@ -92,7 +107,7 @@ class DefaultControllerTest extends WebTestCase
      */
     public function testIndexButtonProgressTasks()
     {
-        $this->loginUser();
+        $this->client->loginUser($this->user);
 
         $crawler = $this->client->request(Request::METHOD_GET, $this->urlGenerator->generate('homepage'));
 
@@ -108,7 +123,7 @@ class DefaultControllerTest extends WebTestCase
      */
     public function testIndexButtonCreateTasks()
     {
-        $this->loginUser();
+        $this->client->loginUser($this->user);
 
         $crawler = $this->client->request(Request::METHOD_GET, $this->urlGenerator->generate('homepage'));
 
@@ -117,15 +132,5 @@ class DefaultControllerTest extends WebTestCase
 
         $this->assertSelectorTextContains('h1', "Création d'une tâche");
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
-    }
-
-    /**
-     * Login user
-     */
-    private function loginUser()
-    {
-        $userRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
-        $user = $userRepository->findByUsername("User0");
-        $this->client->loginUser($user[0]);
     }
 }

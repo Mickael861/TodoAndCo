@@ -1,8 +1,9 @@
 <?php
 
-namespace Tests\Controller;
+namespace tests\Controller\WebTestCase\security;
 
 use App\Entity\User;
+use App\TestsHelper\WebTestCaseHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -24,14 +25,20 @@ class SecurityControllerTest extends WebTestCase
      */
     private $user;
 
+    /**
+     * @var WebTestCaseHelper
+     */
+    private $webTestCaseHelper;
+
     public function setUp(): void
     {
         $this->client = static::createClient();
 
         $this->urlGenerator = $this->client->getContainer()->get('router.default');
 
-        $userRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
-        $this->user = $userRepository->findByUsername("user0")[0];
+        $this->webTestCaseHelper = new WebTestCaseHelper($this->client, $this->urlGenerator);
+
+        $this->user = $this->webTestCaseHelper->getEntity(User::class, 'findByUsername', 'user0');
     }
 
     /**
@@ -67,12 +74,10 @@ class SecurityControllerTest extends WebTestCase
     {
         $crawler = $this->client->request(Request::METHOD_GET, $this->urlGenerator->generate('login'));
 
-        $form = $crawler->selectButton('btn-form')->form([
+        $this->webTestCaseHelper->submitForm($crawler, 'btn-form', [
             '_username' => 'user0',
             '_password' => 'password0'
         ]);
-
-        $this->client->submit($form);
 
         $this->client->followRedirect();
 
@@ -90,12 +95,10 @@ class SecurityControllerTest extends WebTestCase
     {
         $crawler = $this->client->request(Request::METHOD_GET, $this->urlGenerator->generate('login'));
 
-        $form = $crawler->selectButton('btn-form')->form([
+        $this->webTestCaseHelper->submitForm($crawler, 'btn-form', [
             '_username' => 'user3',
             '_password' => 'password3'
         ]);
-
-        $this->client->submit($form);
 
         $this->client->followRedirect();
 
