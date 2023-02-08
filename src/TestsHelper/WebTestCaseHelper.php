@@ -2,8 +2,6 @@
 
 namespace App\TestsHelper;
 
-use App\Entity\Task;
-use App\Entity\User;
 use Exception;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
