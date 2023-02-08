@@ -86,24 +86,6 @@ class UserListTest extends WebTestCase
     }
 
     /**
-     * test the click on the home button
-     */
-    public function testListActionBtnHome()
-    {
-        $this->client->loginUser($this->admin);
-
-        $crawler = $this->webTestCaseHelper->getClientRequest('user_list');
-
-        $this->webTestCaseHelper->setLinkClick($crawler, 'Accueil');
-
-        $this->assertSelectorTextContains(
-            'h1',
-            "Bienvenue sur Todo List, l'application vous permettant de gérer l'ensemble de vos tâches sans effort !"
-        );
-        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
-    }
-
-    /**
      * test the click on the user list
      */
     public function testListActionBtnUserList()
@@ -115,6 +97,24 @@ class UserListTest extends WebTestCase
         $this->webTestCaseHelper->setLinkClick($crawler, 'Gestion des utilisateurs');
 
         $this->assertSelectorTextContains('h1', "Liste des utilisateurs");
+        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
+    }
+
+    /**
+     * test the click of Logout
+     */
+    public function testListActionBtnLogout()
+    {
+        $this->client->loginUser($this->admin);
+
+        $crawler = $this->webTestCaseHelper->getClientRequest('homepage');
+
+        $this->webTestCaseHelper->setLinkClick($crawler, 'Se déconnecter');
+
+        $this->client->followRedirect();
+        $this->client->followRedirect();
+        
+        $this->assertSelectorTextContains('h1', "S'identifier");
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
     }
 

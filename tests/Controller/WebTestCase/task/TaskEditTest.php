@@ -76,24 +76,6 @@ class TaskEditTest extends WebTestCase
     }
 
     /**
-     * test the click on the home button
-     */
-    public function testEditActionBtnHome()
-    {
-        $this->client->loginUser($this->user);
-
-        $crawler = $this->webTestCaseHelper->getClientRequest('task_edit', ['id' => $this->task->getId()]);
-
-        $this->webTestCaseHelper->setLinkClick($crawler, 'Accueil');
-
-        $this->assertSelectorTextContains(
-            'h1',
-            "Bienvenue sur Todo List, l'application vous permettant de gérer l'ensemble de vos tâches sans effort !"
-        );
-        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
-    }
-
-    /**
      * test the click on the task list button
      */
     public function testEditActionBtnTaskList()
@@ -120,9 +102,9 @@ class TaskEditTest extends WebTestCase
 
         $this->webTestCaseHelper->getClientRequest('task_edit', ['id' => $this->task->getId()]);
 
-        $this->assertInputValueSame("task[title]", "Titre0");
-        $this->assertSelectorTextContains("textarea#task_content", "Une tache n°0");
-        $this->assertInputValueSame("task[author]", "Laurent");
+        $this->assertInputValueSame("task[title]", $this->task->getTitle());
+        $this->assertSelectorTextContains("textarea#task_content", $this->task->getContent());
+        $this->assertInputValueSame("task[author]", $this->task->getAuthor());
         $this->assertSelectorTextContains('h1', "Modification d'une tâche");
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
     }

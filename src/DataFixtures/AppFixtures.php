@@ -62,7 +62,7 @@ class AppFixtures extends Fixture
                 ->setTitle("Titre$iterator")
                 ->setContent("Une tache n°$iterator")
                 ->toggle($toggle[$iterator])
-                ->setUser($user[0])
+                ->setUser($user[$iterator])
                 ->setAuthor("Laurent");
 
             $manager->persist($task);
@@ -74,8 +74,8 @@ class AppFixtures extends Fixture
     private function createDatas(ObjectManager $manager)
     {
         $roles = [
-            '0' => ['ROLE' => 'ROLE_USER'],
-            '1' => ['ROLE' => 'ROLE_ADMIN']
+            '0' => ['ROLE_USER'],
+            '1' => ['ROLE_ADMIN']
         ];
 
         for ($iterator = 0; $iterator <= 1; $iterator++) {

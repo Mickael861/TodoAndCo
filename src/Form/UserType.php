@@ -47,7 +47,7 @@ class UserType extends AbstractType
                 function () {
                 },
                 function ($rolesAsArray) {
-                    return ['ROLE' => $rolesAsArray];
+                    return [$rolesAsArray];
                 }
             ))
         ;

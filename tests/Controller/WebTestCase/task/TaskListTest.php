@@ -2,6 +2,7 @@
 
 namespace tests\Controller\WebTestCase\task;
 
+use App\Entity\Task;
 use App\Entity\User;
 use App\TestsHelper\WebTestCaseHelper;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,6 +27,11 @@ class TaskListTest extends WebTestCase
     private $user;
 
     /**
+     * @var User
+     */
+    private $admin;
+
+    /**
      * @var WebTestCaseHelper
      */
     private $webTestCaseHelper;
@@ -39,6 +45,7 @@ class TaskListTest extends WebTestCase
         $this->webTestCaseHelper = new WebTestCaseHelper($this->client, $this->urlGenerator);
 
         $this->user = $this->webTestCaseHelper->getEntity(User::class, 'findByUsername', 'user0');
+        $this->admin = $this->webTestCaseHelper->getEntity(User::class, 'findByUsername', 'user1');
     }
 
     /**
@@ -165,7 +172,7 @@ class TaskListTest extends WebTestCase
      */
     public function testListActionBtnToggleProgressTask()
     {
-        $this->client->loginUser($this->user);
+        $this->client->loginUser($this->admin);
 
         $this->submitFormTaskId('task_list', ['is_done' => 'progress'], "Titre1", "btn-toggle");
 
@@ -198,7 +205,7 @@ class TaskListTest extends WebTestCase
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
     }
 
-        /**
+    /**
      * submit form with task identifier
      *
      * @param string $route_name Name of the route
@@ -207,7 +214,7 @@ class TaskListTest extends WebTestCase
      * @param  string $selector_btn_form The form button selector
      * @return void
      */
-    public function submitFormTaskId(
+    private function submitFormTaskId(
         string $route_name,
         array $parameter_url,
         string $title_task,

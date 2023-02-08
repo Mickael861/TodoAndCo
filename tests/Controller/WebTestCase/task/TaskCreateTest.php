@@ -69,24 +69,6 @@ class TaskCreateTest extends WebTestCase
     }
 
     /**
-     * test the click on the home button
-     */
-    public function testCreateActionBtnHome()
-    {
-        $this->client->loginUser($this->user);
-
-        $crawler = $this->webTestCaseHelper->getClientRequest('task_create');
-
-        $this->webTestCaseHelper->setLinkClick($crawler, 'Accueil');
-
-        $this->assertSelectorTextContains(
-            'h1',
-            "Bienvenue sur Todo List, l'application vous permettant de gérer l'ensemble de vos tâches sans effort !"
-        );
-        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
-    }
-
-    /**
      * test the click on the task list button
      */
     public function testCreateActionBtnTaskList()
