@@ -3,6 +3,7 @@
 namespace App\TestsHelper;
 
 use Exception;
+use App\Entity\Task;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -85,5 +86,31 @@ class WebTestCaseHelper
         }
 
         return $entity[0];
+    }
+
+    /**
+     * submit form with task identifier
+     *
+     * @param string $route_name Name of the route
+     * @param  array $parameter_url Parameter to pass to the url
+     * @param  string $title_task Title of the task
+     * @param  string $service Service repository
+     * @param  string $selector_btn_form The form button selector
+     * @return void
+     */
+    public function submitFormTaskIdetifier(
+        string $route_name,
+        array $parameter_url,
+        string $title_task,
+        string $serviceEntity,
+        string $selector_btn_form
+    ): void {
+        $crawler = $this->getClientRequest($route_name, $parameter_url);
+
+        $id_task = $this->getEntity(Task::class, $serviceEntity, $title_task)->getId();
+
+        $selector_completed = $selector_btn_form . '-' . $id_task;
+
+        $this->submitForm($crawler, $selector_completed);
     }
 }
