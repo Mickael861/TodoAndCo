@@ -2,7 +2,6 @@
 
 namespace tests\Controller\WebTestCase\task;
 
-use App\Entity\Task;
 use App\Entity\User;
 use App\TestsHelper\WebTestCaseHelper;
 use Symfony\Component\HttpFoundation\Response;
@@ -155,7 +154,13 @@ class TaskListTest extends WebTestCase
     {
         $this->client->loginUser($this->user);
 
-        $this->submitFormTaskId('task_list', ['is_done' => 'ended'], "Titre0", "btn-toggle");
+        $this->webTestCaseHelper->submitFormTaskIdetifier(
+            'task_list',
+            ['is_done' => 'ended'],
+            "Titre0",
+            "findByTitle",
+            "btn-toggle"
+        );
 
         $this->client->followRedirect();
 
@@ -174,7 +179,13 @@ class TaskListTest extends WebTestCase
     {
         $this->client->loginUser($this->admin);
 
-        $this->submitFormTaskId('task_list', ['is_done' => 'progress'], "Titre1", "btn-toggle");
+        $this->webTestCaseHelper->submitFormTaskIdetifier(
+            'task_list',
+            ['is_done' => 'progress'],
+            "Titre1",
+            "findByTitle",
+            "btn-toggle"
+        );
 
         $this->client->followRedirect();
 
@@ -193,7 +204,13 @@ class TaskListTest extends WebTestCase
     {
         $this->client->loginUser($this->user);
 
-        $this->submitFormTaskId('task_list', ['is_done' => 'all'], "Titre0", "btn-delete");
+        $this->webTestCaseHelper->submitFormTaskIdetifier(
+            'task_list',
+            ['is_done' => 'all'],
+            "Titre0",
+            "findByTitle",
+            "btn-delete"
+        );
 
         $this->client->followRedirect();
 
@@ -203,29 +220,5 @@ class TaskListTest extends WebTestCase
         );
         $this->assertSelectorTextContains('h1', "Liste des tâches terminées");
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
-    }
-
-    /**
-     * submit form with task identifier
-     *
-     * @param string $route_name Name of the route
-     * @param  array $parameter_url Parameter to pass to the url
-     * @param  string $title_task Title of the task
-     * @param  string $selector_btn_form The form button selector
-     * @return void
-     */
-    private function submitFormTaskId(
-        string $route_name,
-        array $parameter_url,
-        string $title_task,
-        string $selector_btn_form
-    ): void {
-        $crawler = $this->webTestCaseHelper->getClientRequest($route_name, $parameter_url);
-
-        $id_task = $this->webTestCaseHelper->getEntity(Task::class, 'findByTitle', $title_task)->getId();
-
-        $selector_completed = $selector_btn_form . '-' . $id_task;
-
-        $this->webTestCaseHelper->submitForm($crawler, $selector_completed);
     }
 }

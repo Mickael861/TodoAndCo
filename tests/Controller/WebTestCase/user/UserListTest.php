@@ -113,7 +113,7 @@ class UserListTest extends WebTestCase
 
         $this->client->followRedirect();
         $this->client->followRedirect();
-        
+
         $this->assertSelectorTextContains('h1', "S'identifier");
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
     }
