@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Task;
+use App\Entity\User;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,11 +26,16 @@ class TaskService extends AbstractController
      *
      * @param  FormInterface $form task form
      * @param  Task $task Entity Task
+     * @param User $user user
      * @param  string $route_name Name of the route
      * @return bool True if the backup is successful, false otherwise
      */
-    public function crudTaskManagement(FormInterface $form, Task $task, string $route_name = 'task_create'): bool
-    {
+    public function crudTaskManagement(
+        FormInterface $form,
+        Task $task,
+        User $user = null,
+        string $route_name = 'task_create'
+    ): bool {
         $success = false;
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -39,7 +45,7 @@ class TaskService extends AbstractController
 
                     break;
                 default:
-                    $this->createTask($task);
+                    $this->createTask($task, $user);
 
                     break;
             }
@@ -91,14 +97,15 @@ class TaskService extends AbstractController
      * Task backup management
      *
      * @param  Task $task Entity Task
+     * @param User $user user
      *
      * @return void
      */
-    private function createTask(Task $task): void
+    private function createTask(Task $task, User $user): void
     {
         $entityManager = $this->managerRegistry->getManager();
 
-        $task->setUser($this->getUser());
+        $task->setUser($user);
 
         $entityManager->persist($task);
         $entityManager->flush();
@@ -114,7 +121,7 @@ class TaskService extends AbstractController
     {
         switch ($is_done) {
             case 'ended':
-                $type_task = "terminées";
+                $type_task = "terminée";
 
                 break;
             case 'progress':

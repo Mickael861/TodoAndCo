@@ -57,3 +57,14 @@ Dès que vous avez appuyé sur le bouton **Create pull request**, le dépôt off
 Désormais vous savez comment contribuer au projet Todo & co.
 
 ![GitHub bouton "Compare & pull request"](/public/img/giphy.gif)
+
+## Processus de qualité
+
+Vous utiliserez Codacy ou CodeClimate pour auditer la qualité du code.
+
+Le code devras suivre certaine régle :
+1.  10 fonctions maximum dans une classe et le moins de condition possible (PHPMD),
+2.  Pas de duplication de code, factoriser un maximum (PHPCPD),
+3.  Respecter les bonnes pratique en matiére de developpement PHP/Symfony (PHPCBF)
+
+

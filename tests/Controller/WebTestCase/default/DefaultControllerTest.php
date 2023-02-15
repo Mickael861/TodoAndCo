@@ -98,7 +98,7 @@ class DefaultControllerTest extends WebTestCase
         $link = $crawler->selectLink('Consulter la liste des tâches terminées')->link();
         $this->client->click($link);
 
-        $this->assertSelectorTextContains('h1', "Liste des tâches terminées");
+        $this->assertSelectorTextContains('h1', "Liste des tâches terminée");
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
     }
 
