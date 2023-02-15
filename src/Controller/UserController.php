@@ -3,9 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\User;
-use App\Service\FormService;
+use App\Form\UserType;
 use App\Service\UserService;
-use App\Service\SecurityService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Security;
@@ -26,24 +25,14 @@ class UserController extends AbstractController
     private $userService;
 
     /**
-     * @var FormService
-     */
-    private $formService;
-
-    /**
      * @var Security
      */
     private $security;
 
-    public function __construct(
-        ManagerRegistry $managerRegistry,
-        UserService $userService,
-        FormService $formService,
-        Security $security
-    ) {
+    public function __construct(ManagerRegistry $managerRegistry, UserService $userService, Security $security)
+    {
         $this->managerRegistry = $managerRegistry;
         $this->userService = $userService;
-        $this->formService = $formService;
         $this->security = $security;
     }
 
@@ -72,7 +61,8 @@ class UserController extends AbstractController
 
         $user = new User();
 
-        $formUser = $this->formService->getUserForm($request, $user);
+        $formUser = $this->createForm(UserType::class, $user);
+        $formUser->handleRequest($request);
         if ($this->userService->crudUserManagement($formUser, $user)) {
             $this->addFlash('success', "L'utilisateur a bien été ajouté.");
 
@@ -91,7 +81,8 @@ class UserController extends AbstractController
 
         $route_name = $request->get('_route');
 
-        $formUser = $this->formService->getUserForm($request, $user);
+        $formUser = $this->createForm(UserType::class, $user);
+        $formUser->handleRequest($request);
         if ($this->userService->crudUserManagement($formUser, $user, $route_name)) {
             $this->addFlash('success', "L'utilisateur a bien été modifié");
 

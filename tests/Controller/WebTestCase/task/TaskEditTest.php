@@ -136,7 +136,7 @@ class TaskEditTest extends WebTestCase
             'div.alert.alert-success',
             "Superbe ! La tâche a bien été modifiée."
         );
-        $this->assertSelectorTextContains('h1', "Liste des tâches terminées");
+        $this->assertSelectorTextContains('h1', "Liste des tâches terminée");
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
     }
 
@@ -187,7 +187,7 @@ class TaskEditTest extends WebTestCase
             'div.alert.alert-success',
             "Superbe ! La tâche a bien été modifiée."
         );
-        $this->assertSelectorTextContains('h1', "Liste des tâches terminées");
+        $this->assertSelectorTextContains('h1', "Liste des tâches terminée");
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
     }
 }

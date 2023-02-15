@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Task;
-use App\Service\FormService;
+use App\Form\TaskType;
 use App\Service\TaskService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,19 +23,10 @@ class TaskController extends AbstractController
      */
     private $taskService;
 
-    /**
-     * @var FormService
-     */
-    private $formService;
-
-    public function __construct(
-        ManagerRegistry $manager,
-        TaskService $taskService,
-        FormService $formService
-    ) {
+    public function __construct(ManagerRegistry $manager, TaskService $taskService)
+    {
         $this->manager = $manager;
         $this->taskService = $taskService;
-        $this->formService = $formService;
     }
 
     /**
@@ -43,9 +34,6 @@ class TaskController extends AbstractController
      */
     public function listAction(string $is_done): Response
     {
-        /**
-         * @var ObjectRepository
-         */
         $repository = $this->manager->getRepository(Task::class);
         $task = $repository->findTaskList($is_done);
 
@@ -64,8 +52,9 @@ class TaskController extends AbstractController
     {
         $task = new Task();
 
-        $taskForm = $this->formService->getTaskForm($request, $task);
-        if ($this->taskService->crudTaskManagement($taskForm, $task)) {
+        $taskForm = $this->createForm(TaskType::class, $task);
+        $taskForm->handleRequest($request);
+        if ($this->taskService->crudTaskManagement($taskForm, $task, $this->getUser())) {
             $this->addFlash('success', 'La tâche a été bien été ajoutée.');
 
             return $this->redirectToRoute('task_list', [
@@ -87,9 +76,9 @@ class TaskController extends AbstractController
 
         $route_name = $request->get('_route');
 
-        $taskForm = $this->formService->getTaskForm($request, $task);
-
-        if ($this->taskService->crudTaskManagement($taskForm, $task, $route_name)) {
+        $taskForm = $this->createForm(TaskType::class, $task);
+        $taskForm->handleRequest($request);
+        if ($this->taskService->crudTaskManagement($taskForm, $task, null, $route_name)) {
             $this->addFlash('success', 'La tâche a bien été modifiée.');
 
             $is_done = $task->isDone() ? 'ended' : 'progress';
@@ -134,11 +123,11 @@ class TaskController extends AbstractController
     {
         $this->denyAccessUnlessGranted('TASK_DELETE', $task);
 
+        $is_done = $task->isDone() ? 'ended' : 'progress';
+
         $this->taskService->deleteTask($task);
 
         $this->addFlash('success', 'La tâche a bien été supprimée.');
-
-        $is_done = $task->isDone() ? 'ended' : 'progress';
 
         return $this->redirectToRoute('task_list', [
             'is_done' => $is_done
